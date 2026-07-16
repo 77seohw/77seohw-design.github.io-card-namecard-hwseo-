@@ -23,6 +23,11 @@
       --line: rgba(255, 255, 255, 0.16);
       --silver: #d9dee8;
       --white: #ffffff;
+      
+      /* 지도 버튼 브랜드 컬러 추가 */
+      --tmap: #0085FF;
+      --kakao: #FEE500;
+      --naver: #03C75A;
     }
 
     body {
@@ -171,12 +176,111 @@
       word-break: break-word;
     }
 
+    /* 지도 섹션 스타일 추가 */
+    .section {
+      background: var(--white);
+      padding: 24px 28px;
+      border-top: 1px solid #e7eaf0;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: #8c9baf;
+      margin-bottom: 16px;
+    }
+
+    .map-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+      padding: 16px;
+      background: #f8f9fb;
+      border-radius: 12px;
+    }
+
+    .map-pin {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: var(--navy);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .map-text {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .map-text strong {
+      font-size: 15px;
+      color: #071127;
+      font-weight: 750;
+    }
+
+    .map-text span {
+      font-size: 13px;
+      color: #5b6b83;
+      word-break: keep-all;
+    }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .action-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    .action-item:active {
+      transform: scale(0.95);
+    }
+
+    .action-badge, .action-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 18px;
+    }
+
+    .action-icon {
+      background: #eef2f8;
+      color: #19345d;
+    }
+
+    .action-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #5b6b83;
+    }
+
     .trust {
       padding: 22px 28px 30px;
       color: #dfe5ef;
       font-size: 13px;
       line-height: 1.8;
       word-break: keep-all;
+      background: transparent;
     }
 
     @media (max-width: 480px) {
@@ -206,6 +310,10 @@
       .info-row {
         grid-template-columns: 112px 1fr;
         padding-inline: 18px;
+      }
+
+      .section {
+        padding: 24px 18px;
       }
     }
   </style>
@@ -246,9 +354,70 @@
       </div>
     </section>
 
+    <!-- 추가된 위치 및 지도 안내 섹션 -->
+    <div class="section">
+      <div class="section-title">LOCATION</div>
+      <div class="map-info">
+        <div class="map-pin">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div class="map-text">
+          <strong>벤츠 강서목동 전시장</strong>
+          <span>서울 강서구 공항대로 665</span>
+        </div>
+      </div>
+      <div class="action-grid">
+        <button class="action-item" onclick="openTmap()">
+          <div class="action-badge" style="background:var(--tmap);color:white;">T</div>
+          <span class="action-label">티맵</span>
+        </button>
+        <button class="action-item" onclick="openKakaoMap()">
+          <div class="action-badge" style="background:var(--kakao);color:#1a1a1a;">K</div>
+          <span class="action-label">카카오맵</span>
+        </button>
+        <button class="action-item" onclick="openNaverMap()">
+          <div class="action-badge" style="background:var(--naver);color:white;">N</div>
+          <span class="action-label">네이버맵</span>
+        </button>
+        <button class="action-item" onclick="copyAddress()">
+          <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span class="action-label">주소 복사</span>
+        </button>
+      </div>
+    </div>
+
     <section class="trust">
       시승 예약 · 맞춤 견적 상담 · 금융 프로그램 안내 · 빠른 출고 일정 확인까지 처음 상담부터 출고까지 책임감 있게 함께하겠습니다.
     </section>
   </main>
+
+  <!-- 지도 앱 연결 및 주소 복사 기능을 위한 자바스크립트 추가 -->
+  <script>
+    const address = "서울 강서구 공항대로 665";
+
+    function openTmap() {
+      // 모바일 티맵 검색 결과로 이동
+      window.open(`https://tmap.life/app/search/places?q=${encodeURIComponent(address)}`, '_blank');
+    }
+
+    function openKakaoMap() {
+      // 카카오맵 검색 결과로 이동
+      window.open(`https://map.kakao.com/link/search/${encodeURIComponent(address)}`, '_blank');
+    }
+
+    function openNaverMap() {
+      // 네이버 지도 검색 결과로 이동
+      window.open(`https://map.naver.com/v5/search/${encodeURIComponent(address)}`, '_blank');
+    }
+
+    function copyAddress() {
+      // 클립보드에 주소 복사
+      navigator.clipboard.writeText(address).then(() => {
+        alert('전시장 주소가 복사되었습니다.\n내비게이션에 붙여넣기 해주세요!');
+      }).catch(err => {
+        alert('주소 복사를 지원하지 않는 브라우저입니다. 직접 주소를 복사해주세요.');
+      });
+    }
+  </script>
 </body>
 </html>
